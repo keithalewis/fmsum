@@ -128,7 +128,7 @@ Both sides are measures on the atoms of the algebra representing information ava
 
 		return Cnk;
 	}
-	constexpr double probability(const Atom& a)
+	double probability(const Atom& a)
 	{
 		auto [n, k] = a;
 

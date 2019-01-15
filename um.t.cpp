@@ -51,8 +51,21 @@ void test_iota()
 	assert(um::equal(i3, um::array(a3, 2)));
 }
 
+void test_choose()
+{
+	assert(1 == um::choose(7, 0));
+	assert(7 == um::choose(7, 1));
+	assert(21 == um::choose(7, 2));
+	assert(35 == um::choose(7, 3));
+	assert(35 == um::choose(7, 4));
+	assert(21 == um::choose(7, 5));
+	assert(7 == um::choose(7, 6));
+	assert(1 == um::choose(7, 7));
+}
+
 int main()
 {
+	test_choose();
 	test_array();
 	test_sum();
 	test_apply();
