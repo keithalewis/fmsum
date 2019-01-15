@@ -6,7 +6,7 @@
 
 namespace um {
 
-static const char um_doc[] = R"xyzzyx(
+	static const char um_doc[] = R"xyzzyx(
 The unified models values any derivative security using the formula V_t D_t = E_t (A_u + V_u) D_u.
 Both sides are measures on the atoms of the algebra representing information available at time t.
 )xyzzyx";
@@ -29,7 +29,7 @@ Both sides are measures on the atoms of the algebra representing information ava
 		const X* a;
 		size_t n;
 	public:
-		array(const X* a, size_t n)
+		array(const X* a = nullptr, size_t n = 0)
 			: a(a), n(n)
 		{ }
 		operator bool() const
@@ -86,6 +86,7 @@ Both sides are measures on the atoms of the algebra representing information ava
 		}
 	};
 
+	// [b, b + di, ..., e)
 	template<class X>
 	class iota {
 		X b, e, di;
@@ -109,7 +110,30 @@ Both sides are measures on the atoms of the algebra representing information ava
 		}
 	};
 
+	// The set sum_0^k X_i = W_k = j, where X_i is Bernoulli {0,1}.
 	using Atom = std::pair<size_t, size_t>;
+
+	// n!/k!(n - k)! = n/1 * (n-1)/2 * ... (n - k + 1)/k
+	constexpr size_t choose(size_t n, size_t k)
+	{
+		// ensure (n >= k)
+		if (2 * k > n)
+			k = n - k;
+
+		size_t Cnk = 1;
+		for (size_t j = 1; j <= k; ++j) {
+			Cnk *= n--;
+			Cnk /= j;
+		}
+
+		return Cnk;
+	}
+	constexpr double probability(const Atom& a)
+	{
+		auto [n, k] = a;
+
+		return choose(n, k)/std::pow(2., n);
+	}
 
 	class Atoms {
 		size_t n, k, l; // (n,k),...(n,l)
@@ -146,7 +170,7 @@ Both sides are measures on the atoms of the algebra representing information ava
 		// Atoms in Binomial(n) containing a
 		auto atoms(const atom& a)
 		{
-			auto[k, j] = a;
+			auto [k, j] = a;
 			// ensure (j <= k && k <= n)
 			
 			return Atoms(n, j, j + n - k);
@@ -154,16 +178,18 @@ Both sides are measures on the atoms of the algebra representing information ava
 	};
 
 	template<class Measure, class Algebra, class X = double>
-	inline auto eval(const Measure& P, const Algebra& A)
+	inline auto evaluate(const Measure& P, const Algebra& A)
 	{
 		return [](auto a) { return sum(apply(P, A.atoms(a))); };
 	}
 
+	// V_t D_t = (A_u + V_u)D_u|A_t
 	template<class Amount, class Deflator>
 	inline auto value(const Amount& A, const Deflator& D)
 	{
-		return [](auto t, auto a) {
-			return 0;
+		return [](const Atom& a) {
+			auto [k, j] = a;
+			return ;
 		};
 	}
 		
