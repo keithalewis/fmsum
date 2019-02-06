@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="functional.h" />
     <ClInclude Include="um.h" />
   </ItemGroup>
   <ItemGroup>

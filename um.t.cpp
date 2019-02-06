@@ -1,7 +1,22 @@
 // um.t.cpp - Unified Model test
 #include <cassert>
+#include "functional.h"
 #include "um.h"
 
+void test_binop()
+{
+    std::function<int(int)> f = [](int i) { return i; };
+    auto ff = operator_binop(std::plus<int>{},f,f);
+    assert (ff(2) == 4);
+    auto f_plus = f + f;
+    assert (f_plus(3) == 6);
+    auto f_minus = f - f;
+    assert (f_minus(1) == 0);
+    auto f_multiplies = f*f;
+    assert (f_multiplies(3) == 9);
+    auto f_divides = f/f;
+    assert (f_divides(5) == 1);
+}
 void test_array()
 {
 	int a[] = { 1,2,3 };
