@@ -147,7 +147,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="binomial.h" />
     <ClInclude Include="functional.h" />
+    <ClInclude Include="sequence.h" />
     <ClInclude Include="um.h" />
   </ItemGroup>
   <ItemGroup>

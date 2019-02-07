@@ -21,6 +21,12 @@
     <ClInclude Include="functional.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sequence.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="binomial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="um.t.cpp">
