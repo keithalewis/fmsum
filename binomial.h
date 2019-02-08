@@ -24,14 +24,31 @@ namespace um {
 
         return Cnk;
     }
-    inline double probability(const Atom& a)
+    inline double normal_cdf(double z)
+    {
+        return 0.5 * erfc(-z * M_SQRT1_2);
+    }
+    inline double probability0(const Atom& a)
     {
         auto [n,k] = a;
 
-        double sqrtpin_2 = sqrt(M_PI*n/2);
-        double z = static_cast<double>(2 * k - n);
+        return choose(n, k)/std::pow(2., n);
+    }
+    // Wn ~= sqrt(n)/2 Z + n/2 where Z is standard normal
+    inline double probability1(const Atom& a)
+    {
+        auto[n, k] = a;
 
-        return n <= 1 ? choose(n, k)/std::pow(2., n) : exp(-z*z/(2*n))/sqrtpin_2;
+        auto z_ = (k + 0.5 - n/2.)*2/sqrt(1.*n);
+        auto _z = (k - 0.5 - n/2.)*2/sqrt(1.*n);
+
+        return normal_cdf(z_) - normal_cdf(_z);
+    }
+    inline double probability(const Atom& a)
+    {
+        auto[n, k] = a;
+
+        return n <= 52 ? probability0(a) : probability1(a);
     }
 
     class Atoms {
