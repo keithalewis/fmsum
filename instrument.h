@@ -1,36 +1,39 @@
 // instrument.h - sequence of amounts
 #pragma once
 #include <functional>
+#include <utility>
 
 namespace um {
 
-    template<class A>
+    // Option paying amount a at expiration t.
+    template<class T, class A>
     class european {
-        A amount;
-        size_t count;
+        std::pair<T, A> ta;
+        mutable bool b;
     public:
-        european(A a)
-            : amount(a), count(0)
+        european(T t , A a)
+            : ta{t, a}, b(false)
         { }
         bool done() const
         {
-            return count >= 1;
+            return b;
         }
-        A& next()
+        const std::pair<T,A>& next() const
         {
-            ++count;
+            // ensure(!b);
+            b = true;
 
-            return amount;
+            return ta;
         }
     };
 
-    template<class A>
-    inline auto done(const european<A>& i)
+    template<class T, class A>
+    inline auto done(const european<T,A>& i)
     {
         return i.done();
     }
-    template<class A>
-    inline auto next(european<A>& i)
+    template<class T, class A>
+    inline auto next(const european<T,A>& i)
     {
         return i.next();
     }

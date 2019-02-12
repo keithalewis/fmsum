@@ -73,9 +73,10 @@ void test_deflator()
 void test_instrument()
 {
     auto atm = [](const Binomial::Atom& a) { return a.time() == 10 ? std::max(a - 5., 0.) : 0.;};
-    auto inst = um::european(atm);
+    auto inst = um::european(1, atm);
     assert(!done(inst));
-    auto amnt = next(inst);
+    auto [t, amnt] = next(inst);
+    assert(t == 1);
     assert(done(inst));
     assert(0 == amnt(Binomial::Atom{ 0, 0}));
     assert(0 == amnt(Binomial::Atom{10, 4}));
@@ -101,10 +102,19 @@ void test_iota()
 
 void test_probability()
 {
-    for (size_t n = 52; n < 82; ++n) {
-        double s = 0;//um::sum(um::apply(um::probability, Binomial::Atoms(n, 0, n)));
-        s = s;
+    using Atom = um::Binomial::Atom;
+    using Atoms = um::Binomial::Atoms;
+    auto P0 = [](const Atom& a) { return um::probability0(a.time(), a); };
+    auto P1 = [](const Atom& a) { return um::probability1(a.time(), a); };
+
+    for (size_t n = 0; n <= 57; ++n) {
+        double s = um::sum(um::apply(P0, Atoms(n, Atom(0, 0))));
+        assert(s == 1);
+        s = um::sum(um::apply(P1, Atoms(n, Atom(0, 0))));
+        assert(s == 1);
     }
+    assert (1 != um::sum(um::apply(P0, Atoms(58, Atom(0, 0)))));
+    assert (1 == um::sum(um::apply(P1, Atoms(58, Atom(0, 0)))));
 }
 
 void test_sum()

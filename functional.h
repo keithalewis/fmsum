@@ -6,9 +6,10 @@ namespace {
 template<class X, class Y, class Binop>
 inline auto operator_binop(const Binop& binop, const std::function<Y(X)>& f, const std::function<Y(X)>& g)
 {
-    return [&binop,&f,&g](X x) { return binop(f(x), g(x)); };
+    return [&binop,&f,&g](const X& x) { return binop(f(x), g(x)); };
 }
 }
+
 template<class X, class Y>
 inline auto operator+(const std::function<Y(X)>& f,const std::function<Y(X)>& g)
 {

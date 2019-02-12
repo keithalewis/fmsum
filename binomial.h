@@ -35,7 +35,9 @@ namespace um {
         auto z_ = (k + 0.5 - n/2.)*2/sqrt(1.*n);
         auto _z = (k - 0.5 - n/2.)*2/sqrt(1.*n);
 
-        return normal_cdf(z_) - normal_cdf(_z);
+        return k == 0 ? normal_cdf(z_) :
+               k == n ? 1 - normal_cdf(_z) :
+                        normal_cdf(z_) - normal_cdf(_z);
     }
     inline double probability2(size_t n, size_t k, size_t cutoff = 52)
     {
@@ -66,7 +68,7 @@ namespace um {
                 return probability2(n, k);
             }
         };
-        double operator()(const Atom& a)
+        double operator()(const Atom& a) const
         {
             return a.probability();
         }
@@ -74,7 +76,7 @@ namespace um {
         class Atoms {
             size_t m, k, l;
         public:
-            Atoms(size_t m, Atom& atom)
+            Atoms(size_t m, const Atom& atom)
                 : m(m), k(atom), l(atom + (m - atom.time()))
             {
                 // ensure (a.time() <= m);
@@ -97,20 +99,5 @@ namespace um {
         };
 
     };
-
-    /*
-    class Binomial {
-    public:
-        auto operator()(const Atom& atom)
-        {
-            return probability(atom);
-        }
-    };
-    // restriction to subalgebra
-    auto restrict(const Binomial& A)
-    {
-        return [this, &A](const Atom& a) { return sum(apply(A::operator(), this->atoms(a))); };
-    }
-    */
 
 }
