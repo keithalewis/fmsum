@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="binomial.h" />
+    <ClInclude Include="deflator.h" />
     <ClInclude Include="functional.h" />
     <ClInclude Include="instrument.h" />
     <ClInclude Include="sequence.h" />

@@ -6,9 +6,6 @@
 
 namespace um {
 
-    // The set sum_0^k X_i = W_k = j, where X_i is Bernoulli {0,1}.
-    using Atom = std::pair<size_t,size_t>;
-
     // n!/k!(n - k)! = n/1 * (n-1)/2 * ... (n - k + 1)/k
     constexpr size_t choose(size_t n,size_t k)
     {
@@ -28,54 +25,80 @@ namespace um {
     {
         return 0.5 * erfc(-z * M_SQRT1_2);
     }
-    inline double probability0(const Atom& a)
+    inline double probability0(size_t n, size_t k)
     {
-        auto [n,k] = a;
-
         return choose(n, k)/std::pow(2., n);
     }
     // Wn ~= sqrt(n)/2 Z + n/2 where Z is standard normal
-    inline double probability1(const Atom& a)
+    inline double probability1(size_t n, size_t k)
     {
-        auto[n, k] = a;
-
         auto z_ = (k + 0.5 - n/2.)*2/sqrt(1.*n);
         auto _z = (k - 0.5 - n/2.)*2/sqrt(1.*n);
 
         return normal_cdf(z_) - normal_cdf(_z);
     }
-    inline double probability(const Atom& a)
+    inline double probability2(size_t n, size_t k, size_t cutoff = 52)
     {
-        auto[n, k] = a;
-
-        return n <= 52 ? probability0(a) : probability1(a);
+        return n <= cutoff ? probability0(n, k) : probability1(n, k);
     }
 
-    class Atoms {
-        size_t n,k,l; // (n,k),...(n,l)
+    class Binomial {
     public:
-        Atoms(size_t n,size_t k,size_t l)
-            : n(n), k(k), l(l)
+        // { W_n = k }
+        class Atom {
+            size_t n, k;
+        public:
+            Atom(size_t n, size_t k)
+                : n(n), k(k)
+            {
+                // ensure (k <= n)
+            }
+            size_t time() const
+            {
+                return n;
+            }
+            operator size_t() const
+            {
+                return k;
+            }
+            double probability() const
+            {
+                return probability2(n, k);
+            }
+        };
+        double operator()(const Atom& a)
         {
-            // ensure (k <= l && l <= n);
+            return a.probability();
         }
-        operator bool() const
-        {
-            return k <= l;
-        }
-        Atom operator*() const
-        {
-            return Atom(n,k);
-        }
-        Atoms& operator++()
-        {
-            if(k <= l)
-                ++k;
+        // Sub-atoms at time m
+        class Atoms {
+            size_t m, k, l;
+        public:
+            Atoms(size_t m, Atom& atom)
+                : m(m), k(atom), l(atom + (m - atom.time()))
+            {
+                // ensure (a.time() <= m);
+            }
+            operator bool() const
+            {
+                return k <= l;
+            }
+            Atom operator*() const
+            {
+                return Atom{m, k};
+            }
+            Atoms& operator++()
+            {
+                if (k <= l)
+                    ++k;
 
-            return *this;
-        }
+                return *this;
+            }
+        };
+
     };
 
+    /*
     class Binomial {
     public:
         auto operator()(const Atom& atom)
@@ -84,7 +107,6 @@ namespace um {
         }
     };
     // restriction to subalgebra
-    /*
     auto restrict(const Binomial& A)
     {
         return [this, &A](const Atom& a) { return sum(apply(A::operator(), this->atoms(a))); };

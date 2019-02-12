@@ -1,10 +1,13 @@
 // um.t.cpp - Unified Model test
 #include <cassert>
 #include "binomial.h"
+#include "deflator.h"
 #include "functional.h"
 #include "instrument.h"
 #include "sequence.h"
 #include "um.h"
+
+using um::Binomial;
 
 void test_apply()
 {
@@ -62,16 +65,22 @@ void test_choose()
     assert(1 == um::choose(7, 7));
 }
 
+void test_deflator()
+{
+    assert(1 == um::one(Binomial::Atom{0, 0}));
+}
+
 void test_instrument()
 {
-    auto atm = [](const um::Atom& a) { auto[n, k] = a; return n == 10 ? std::max(k - 5., 0.) : 0.;};
+    auto atm = [](const Binomial::Atom& a) { return a.time() == 10 ? std::max(a - 5., 0.) : 0.;};
     auto inst = um::european(atm);
     assert(!done(inst));
     auto amnt = next(inst);
     assert(done(inst));
-    assert(0 == amnt(um::Atom{0, 0}));
-    assert(0 == amnt(um::Atom{10, 5}));
-    assert(1 == amnt(um::Atom{10, 6}));
+    assert(0 == amnt(Binomial::Atom{ 0, 0}));
+    assert(0 == amnt(Binomial::Atom{10, 4}));
+    assert(0 == amnt(Binomial::Atom{10, 5}));
+    assert(1 == amnt(Binomial::Atom{10, 6}));
 }
 
 void test_iota()
@@ -93,9 +102,7 @@ void test_iota()
 void test_probability()
 {
     for (size_t n = 52; n < 82; ++n) {
-        double s = um::sum(um::apply(um::probability0, um::Atoms(n, 0, n)));
-        s = s;
-        s = um::sum(um::apply(um::probability1, um::Atoms(n, 0, n)));
+        double s = 0;//um::sum(um::apply(um::probability, Binomial::Atoms(n, 0, n)));
         s = s;
     }
 }
@@ -108,6 +115,10 @@ void test_sum()
     assert(um::sum(s) == a[0] + a[1] + a[2]);
 }
 
+void test_um()
+{
+}
+
 int main()
 {
     test_apply();
@@ -115,10 +126,12 @@ int main()
     test_binomial();
     test_binop();
     test_choose();
+    test_deflator();
     test_instrument();
     test_iota();
     test_probability();
     test_sum();
+    test_um();
 	
 	return 0;
 }
