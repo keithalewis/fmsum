@@ -72,7 +72,7 @@ void test_deflator()
 
 void test_instrument()
 {
-    auto atm = [](const Binomial::Atom& a) { return a.time() == 10 ? std::max(a - 5., 0.) : 0.;};
+    std::function<double(const Binomial::Atom&)> atm = [](const Binomial::Atom& a) { return a.time() == 10 ? std::max(a - 5., 0.) : 0.;};
     auto inst = um::european(1, atm);
     assert(!done(inst));
     auto [t, amnt] = next(inst);
@@ -127,6 +127,22 @@ void test_sum()
 
 void test_um()
 {
+    using Atom = um::Binomial::Atom;
+    size_t n, k;
+
+    {
+        n = 10;
+        k = 5;
+        std::function<double(const Atom&)> An = [n,k](const Atom& atom) { 
+            assert(atom.time() == n);
+            return static_cast<double>(std::max(atom - k, 0ull));
+        };
+
+        auto I = um::european(n, An);
+        auto V = um::value(I);
+        double s = V(Atom(0, 0));
+        s = s;
+    }
 }
 
 int main()

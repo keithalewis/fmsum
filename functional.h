@@ -11,6 +11,12 @@ inline auto operator_binop(const Binop& binop, const std::function<Y(X)>& f, con
 }
 
 template<class X, class Y>
+inline std::function<Y(const X&)> K(const Y& y)
+{
+    return [y](const X&) { return y; };
+}
+
+template<class X, class Y>
 inline auto operator+(const std::function<Y(X)>& f,const std::function<Y(X)>& g)
 {
     return operator_binop(std::plus<Y>{},f,g);

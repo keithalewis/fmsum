@@ -20,7 +20,12 @@ Both sides are measures on the atoms of the algebra representing information ava
     inline std::function<double(const Binomial::Atom&)> value(Instrument& I/*, const Deflator& D*/)
     {
         return [&I/*, &D*/](const Binomial::Atom& a) {
-            return done(I) ? 0 : ((next(I) + value(I/*, D*/))/* *D*/)(a)/* /D(a)*/;
+            if (I.done()) {
+                0.;
+            }
+            std::pair<size_t, std::function<double(const Binomial::Atom&)>> p = I.next();
+            
+            return ((p.second) + value(I/*, D*/))(a);///* *D*/)(a)/* /D(a)*/;
         };
     }
 

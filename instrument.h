@@ -8,17 +8,17 @@ namespace um {
     // Option paying amount a at expiration t.
     template<class T, class A>
     class european {
-        std::pair<T, A> ta;
+        std::pair<T, std::function<double(const A&)>> ta;
         mutable bool b;
     public:
-        european(T t , A a)
+        european(T t , const std::function<double(const A&)>& a)
             : ta{t, a}, b(false)
         { }
         bool done() const
         {
             return b;
         }
-        const std::pair<T,A>& next() const
+        const std::pair<T, std::function<double(const A&)>>& next() const
         {
             // ensure(!b);
             b = true;
@@ -37,4 +37,6 @@ namespace um {
     {
         return i.next();
     }
+
+    // !!!instrument should be parameterized by the time and algebra
 }

@@ -44,6 +44,11 @@ namespace um {
         return n <= cutoff ? probability0(n, k) : probability1(n, k);
     }
 
+    /*
+    Measure<T> parameterized by time
+    Measure<T>::Atom
+    Measure<U>::Atoms(Measure<T>::Atom) - atoms at time U containing atom at time T <= U.
+    */
     class Binomial {
     public:
         // { W_n = k }
