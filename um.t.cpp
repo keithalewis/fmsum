@@ -55,14 +55,14 @@ void test_binop()
 
 void test_choose()
 {
-    assert(1 == um::choose(7, 0));
-    assert(7 == um::choose(7, 1));
+    assert( 1 == um::choose(7, 0));
+    assert( 7 == um::choose(7, 1));
     assert(21 == um::choose(7, 2));
     assert(35 == um::choose(7, 3));
     assert(35 == um::choose(7, 4));
     assert(21 == um::choose(7, 5));
-    assert(7 == um::choose(7, 6));
-    assert(1 == um::choose(7, 7));
+    assert( 7 == um::choose(7, 6));
+    assert( 1 == um::choose(7, 7));
 }
 
 void test_deflator()
