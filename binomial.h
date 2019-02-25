@@ -2,6 +2,7 @@
 #pragma once
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <functional>
 #include <utility>
 
 namespace um {
@@ -21,13 +22,15 @@ namespace um {
 
         return Cnk;
     }
+	// Standard normal cumulative distribution.
     inline double normal_cdf(double z)
     {
         return 0.5 * erfc(-z * M_SQRT1_2);
     }
+	// n choose k / 2^n
     inline double probability0(size_t n, size_t k)
     {
-        return choose(n, k)/std::pow(2., n);
+        return ::ldexp(choose(n, k), -static_cast<int>(n));
     }
     // Wn ~= sqrt(n)/2 Z + n/2 where Z is standard normal
     inline double probability1(size_t n, size_t k)
@@ -45,9 +48,9 @@ namespace um {
     }
 
     /*
-    Measure<T> parameterized by time
-    Measure<T>::Atom
-    Measure<U>::Atoms(Measure<T>::Atom) - atoms at time U containing atom at time T <= U.
+    Measure
+    Measure::Atom
+    Measure::Atoms(Measure::Atom) - atoms at time U containing atom at time T <= U.
     */
     class Binomial {
     public:
@@ -73,11 +76,12 @@ namespace um {
                 return probability2(n, k);
             }
         };
-        double operator()(const Atom& a) const
+		double operator()(const Atom& a)
         {
             return a.probability();
         }
-        // Sub-atoms at time m
+		using measure = std::function<double(const Atom&)>;
+		// Sub-atoms at time m
         class Atoms {
             size_t m, k, l;
         public:

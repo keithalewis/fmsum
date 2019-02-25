@@ -36,6 +36,33 @@ void test_array()
 
 void test_binomial()
 {
+	using namespace um;
+
+	Binomial::Atom a(3,2);
+	assert (a.time() == 3);
+	assert (a == 2);
+
+	const Binomial::measure& P = [](const Binomial::Atom& a) { return a.probability(); };
+	assert (P(a) == 3./8);
+
+	//          (5,4)
+	//         /
+	//        *-(5,3)
+	//       /
+	//  (3,2)-*-(5,2)
+	Binomial::Atoms as(5, a);
+	assert (as);
+	assert (*  as == 2);
+	assert (*++as == 3);
+	assert (*++as == 4);
+	assert (!++as);
+
+	const Binomial::measure& X = [](const Binomial::Atom & a) { return 1.*a*a; };
+	assert (X(a) == 4);
+	auto XP = X*P;
+	assert (XP(a) == 3./2);
+	assert (XP(Binomial::Atom(3, 2)) == 3./2);
+	assert (XP(Binomial::Atom(3, 1)) == 3./8);
 }
 
 void test_binop()
@@ -157,7 +184,7 @@ int main()
     test_iota();
     test_probability();
     test_sum();
-    test_um();
+    //test_um();
 	
 	return 0;
 }
